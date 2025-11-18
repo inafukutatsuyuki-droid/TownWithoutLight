@@ -7,6 +7,7 @@
 - [フェーズ別ロードマップ](docs/development_plan.md)
 - [6か月ガントチャート](docs/gantt.md)
 - [CodeXプロジェクトページ草案](docs/codex_project_page.md)
+- [プログラム開発タスクリスト](docs/dev_tasklist.md)
 
 ## プロジェクトゴール
 1. **フェーズ0（企画準備）**で世界観、ゲーム性、アセット要件を固める。
