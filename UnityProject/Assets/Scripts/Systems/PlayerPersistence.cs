@@ -1,20 +1,25 @@
+using System;
 using UnityEngine;
 using TownWithoutLight.Player;
+using TownWithoutLight.Puzzles;
 
 namespace TownWithoutLight.Systems
 {
     /// <summary>
-    /// Simple component that serializes player position + rotation using the <see cref="SaveSystem"/>.
+    /// Simple component that serializes player position + rotation using the <see cref="SaveSystem"/> while also persisting progression systems.
     /// </summary>
     public class PlayerPersistence : MonoBehaviour
     {
-        [SerializeField] private PlayerController playerController;
+        [SerializeField] private Flashlight flashlight;
         [SerializeField] private Transform playerRoot;
+        [SerializeField] private ChapterStateMachine chapterStateMachine;
 
         private void Reset()
         {
-            playerController = FindObjectOfType<PlayerController>();
-            playerRoot = playerController != null ? playerController.transform : null;
+            var controller = FindObjectOfType<PlayerController>();
+            playerRoot = controller != null ? controller.transform : null;
+            flashlight = FindObjectOfType<Flashlight>();
+            chapterStateMachine = FindObjectOfType<ChapterStateMachine>();
         }
 
         public void Save()
@@ -28,7 +33,13 @@ namespace TownWithoutLight.Systems
             {
                 playerPosition = playerRoot.position,
                 playerRotation = playerRoot.rotation,
-                checkpointId = string.Empty
+                checkpointId = string.Empty,
+                collectedFlags = FlagManager.Instance != null ? FlagManager.Instance.GetAllFlags() : Array.Empty<string>(),
+                collectedClues = ClueManager.Instance != null ? ClueManager.Instance.GetCollectedClues() : Array.Empty<string>(),
+                solvedPuzzles = PuzzleManager.Instance != null ? PuzzleManager.Instance.GetSolvedPuzzles() : Array.Empty<string>(),
+                chapterState = chapterStateMachine != null ? chapterStateMachine.CurrentChapter : ChapterState.Prologue,
+                flashlightBattery = flashlight != null ? flashlight.BatteryNormalized : 1f,
+                flashlightEnabled = flashlight != null && flashlight.IsOn
             };
 
             SaveSystem.Save(data);
@@ -45,6 +56,20 @@ namespace TownWithoutLight.Systems
             {
                 playerRoot.position = data.playerPosition;
                 playerRoot.rotation = data.playerRotation;
+
+                FlagManager.Instance?.LoadFlags(data.collectedFlags);
+                ClueManager.Instance?.LoadClues(data.collectedClues);
+                PuzzleManager.Instance?.LoadSolvedPuzzles(data.solvedPuzzles);
+                if (chapterStateMachine != null)
+                {
+                    chapterStateMachine.SetChapter(data.chapterState);
+                }
+
+                if (flashlight != null)
+                {
+                    flashlight.RestoreBattery(data.flashlightBattery);
+                    flashlight.SetActive(data.flashlightEnabled);
+                }
             }
         }
     }

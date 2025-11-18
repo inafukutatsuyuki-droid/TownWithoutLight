@@ -1,4 +1,5 @@
 using UnityEngine;
+using TownWithoutLight.Systems;
 
 namespace TownWithoutLight.Player
 {
@@ -20,12 +21,17 @@ namespace TownWithoutLight.Player
 
         private void Start()
         {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
+            ApplyCursorState(true);
         }
 
         private void Update()
         {
+            var stateManager = GameStateManager.Instance;
+            if (stateManager != null && stateManager.CurrentState != GameState.Exploring)
+            {
+                return;
+            }
+
             float mouseX = Input.GetAxis("Mouse X") * sensitivity;
             float mouseY = Input.GetAxis("Mouse Y") * sensitivity;
 
@@ -38,6 +44,19 @@ namespace TownWithoutLight.Player
             {
                 cameraRoot.localRotation = Quaternion.Euler(_pitch, 0f, 0f);
             }
+        }
+
+        public void SetSensitivity(float value)
+        {
+            sensitivity = Mathf.Max(0.01f, value);
+        }
+
+        public float GetSensitivity() => sensitivity;
+
+        public void ApplyCursorState(bool locked)
+        {
+            Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
+            Cursor.visible = !locked;
         }
     }
 }

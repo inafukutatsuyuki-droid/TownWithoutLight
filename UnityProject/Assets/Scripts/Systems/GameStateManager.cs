@@ -8,7 +8,9 @@ namespace TownWithoutLight.Systems
         Title,
         Exploring,
         Paused,
-        Cutscene
+        Cutscene,
+        Puzzle,
+        Ending
     }
 
     /// <summary>
@@ -42,8 +44,20 @@ namespace TownWithoutLight.Systems
             }
 
             CurrentState = newState;
+            Time.timeScale = CurrentState == GameState.Paused ? 0f : 1f;
             OnStateChanged?.Invoke(newState);
-            Time.timeScale = newState == GameState.Paused ? 0f : 1f;
+        }
+
+        public void TogglePause()
+        {
+            if (CurrentState == GameState.Paused)
+            {
+                SetState(GameState.Exploring);
+            }
+            else if (CurrentState == GameState.Exploring)
+            {
+                SetState(GameState.Paused);
+            }
         }
     }
 }

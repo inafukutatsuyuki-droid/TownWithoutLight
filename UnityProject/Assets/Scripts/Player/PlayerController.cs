@@ -1,5 +1,5 @@
 using UnityEngine;
-using TownWithoutLight.Interaction;
+using TownWithoutLight.Systems;
 
 namespace TownWithoutLight.Player
 {
@@ -17,7 +17,6 @@ namespace TownWithoutLight.Player
 
         [Header("References")]
         [SerializeField] private Flashlight flashlight;
-        [SerializeField] private Interactor interactor;
 
         private CharacterController _controller;
         private Vector3 _verticalVelocity;
@@ -29,8 +28,24 @@ namespace TownWithoutLight.Player
 
         private void Update()
         {
+            if (!IsMovementAllowed())
+            {
+                return;
+            }
+
             HandleMovement();
             HandleFlashlight();
+        }
+
+        private bool IsMovementAllowed()
+        {
+            if (!enabled)
+            {
+                return false;
+            }
+
+            var stateManager = GameStateManager.Instance;
+            return stateManager == null || stateManager.CurrentState == GameState.Exploring;
         }
 
         private void HandleMovement()
