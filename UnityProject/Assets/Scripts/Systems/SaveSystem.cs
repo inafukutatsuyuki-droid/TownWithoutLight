@@ -46,5 +46,11 @@ namespace TownWithoutLight.Systems
         public Vector3 playerPosition;
         public Quaternion playerRotation;
         public string checkpointId;
+        public string[] collectedFlags;
+        public string[] collectedClues;
+        public string[] solvedPuzzles;
+        public ChapterState chapterState;
+        public float flashlightBattery;
+        public bool flashlightEnabled;
     }
 }

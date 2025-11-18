@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using TownWithoutLight.Systems;
 
 namespace TownWithoutLight.Interaction
 {
@@ -27,6 +28,11 @@ namespace TownWithoutLight.Interaction
 
         private void Update()
         {
+            if (!CanProcess())
+            {
+                return;
+            }
+
             UpdateFocus();
 
             if (_currentTarget != null && _currentTarget.CanInteract && Input.GetKeyDown(KeyCode.E))
@@ -34,6 +40,12 @@ namespace TownWithoutLight.Interaction
                 _currentTarget.Interact(this);
                 OnInteracted?.Invoke(_currentTarget);
             }
+        }
+
+        private bool CanProcess()
+        {
+            var stateManager = GameStateManager.Instance;
+            return stateManager == null || stateManager.CurrentState == GameState.Exploring || stateManager.CurrentState == GameState.Puzzle;
         }
 
         private void UpdateFocus()
